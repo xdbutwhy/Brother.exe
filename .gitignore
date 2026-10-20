@@ -1,0 +1,36 @@
+# Credentials and local configuration
+.env
+.env.*
+*.env
+*.env.*
+!token.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+# Private runtime data and local investigation notes
+memory.json
+memory.json.*
+incident-*
+PROJECT_CONTEXT.md
+CODEX_TASKS.md
+# Python environments, caches and generated artifacts
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage*
+htmlcov/
+build/
+dist/
+*.egg-info/
+*.log
+*.bak
+*.tmp
+# Editors and OS files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
