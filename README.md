@@ -92,8 +92,12 @@ Tests use temporary memory files and mocked external services. They cover per-us
 ## Current limitations
 
 - Local demonstration project; no hosted service or 24/7 deployment.
-- The selected model is `inclusionai/ling-3.0-flash-sante:free` in `ask_ai`; model availability and provider limits may change.
+- The selected model is `openrouter/free` in `ask_ai`; model availability and provider limits may change.
 - Saved notes are explicit facts, not conversation history. There is currently no user command to delete them.
 - JSON storage supports one running bot process, not concurrent writers.
 - Very long AI replies are not split into multiple Telegram messages.
 - No claim of production hardening or complete end-to-end multi-account verification.
+
+### Memory confirmation language
+
+`/remember` confirms Latin-script notes in English and notes containing Russian Cyrillic in Russian. This is a simple script heuristic, not full language detection; other bot commands currently use Russian. The `openrouter/free` route selects an available free model, so the answering model can vary.

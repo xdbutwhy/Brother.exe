@@ -187,7 +187,7 @@ async def ask_ai(message, user_id):
 
     headers = {"Authorization": f"Bearer {api_key}"}
     data = {
-        "model": "inclusionai/ling-3.0-flash-sante:free",
+        "model": "openrouter/free",
         "messages": messages
     }
 
@@ -359,7 +359,9 @@ async def remember(update: Update, context: ContextTypes.DEFAULT_TYPE):
     except MemoryStoreError:
         await message.reply_text(MEMORY_ERROR)
         return
-    await message.reply_text("Запомнил, брат.")
+    # Use English for Latin-script notes; keep Russian for Cyrillic notes.
+    english_note = bool(re.search(r"[A-Za-z]", text)) and not re.search(r"[А-Яа-яЁё]", text)
+    await message.reply_text("Got it, bro. I'll remember that." if english_note else "Запомнил, брат.")
 
 
 async def remember_global(update: Update, context: ContextTypes.DEFAULT_TYPE):

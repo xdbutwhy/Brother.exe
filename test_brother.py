@@ -98,7 +98,7 @@ class AIFallbackTests(TemporaryMemory, unittest.IsolatedAsyncioTestCase):
         self.client.post.assert_awaited_once()
         payload = self.client.post.call_args.kwargs["json"]
         self.assertEqual(payload["messages"][-1], {"role": "user", "content": text})
-        self.assertEqual(payload["model"], "inclusionai/ling-3.0-flash-sante:free")
+        self.assertEqual(payload["model"], "openrouter/free")
 
     async def test_local_handler_normalizes_without_calling_ai(self):
         update = fake_update("  ПРИВЕТ  ")
@@ -341,10 +341,23 @@ class MemoryCommandTests(TemporaryMemory, unittest.IsolatedAsyncioTestCase):
         for user_id, note in ((200, "A_NOTE"), (300, "B_NOTE"), (brother.OWNER_ID, "OWNER_NOTE")):
             update = fake_update(user_id=user_id)
             await brother.remember(update, SimpleNamespace(args=[note]))
-            update.message.reply_text.assert_awaited_once_with("Запомнил, брат.")
+            update.message.reply_text.assert_awaited_once_with("Got it, bro. I'll remember that.")
         memory = brother.load_memory()
         self.assertEqual(memory["users"], {"200": {"notes": ["A_NOTE"]}, "300": {"notes": ["B_NOTE"]}, str(brother.OWNER_ID): {"notes": ["OWNER_NOTE"]}})
         self.assertEqual(memory["global"]["notes"], [])
+
+    async def test_remember_confirmation_matches_note_script_and_preserves_text(self):
+        cases = [
+            ("I enjoy programming languages that spark my curiosity.", "Got it, bro. I'll remember that."),
+            ("Мне нравится Python", "Запомнил, брат."),
+            ("Мой любимый язык программирования интересен мне", "Запомнил, брат."),
+        ]
+        for note, expected in cases:
+            with self.subTest(note=note):
+                update = fake_update(user_id=200)
+                await brother.remember(update, SimpleNamespace(args=note.split()))
+                update.message.reply_text.assert_awaited_once_with(expected)
+                self.assertEqual(brother.load_memory()["users"]["200"]["notes"][-1], note)
 
     async def test_non_owner_and_unknown_sender_refused_before_memory_io(self):
         for handler in (brother.remember_global, brother.canon):
