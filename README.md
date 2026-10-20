@@ -101,3 +101,5 @@ Tests use temporary memory files and mocked external services. They cover per-us
 ### Memory confirmation language
 
 `/remember` confirms Latin-script notes in English and notes containing Russian Cyrillic in Russian. This is a simple script heuristic, not full language detection; other bot commands currently use Russian. The `openrouter/free` route selects an available free model, so the answering model can vary.
+
+Short English greetings receive an English local reply. Greetings with questions are passed intact to AI, which is instructed to follow the language of the current message unless another language is explicitly requested.

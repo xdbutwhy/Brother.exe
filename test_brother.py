@@ -47,8 +47,8 @@ class LocalResponseTests(unittest.TestCase):
             "йо брат": "Йо, брат.",
             "ку!": "Привет, брат.",
             "йо, брат": "Привет, брат.",
-            "hello!": "Привет, брат.",
-            "hi": "Привет, брат.",
+            "hello!": "Hi, bro.",
+            "hi": "Hi, bro.",
             "здарова": "Привет, брат.",
             "как дела?": "Работаю, брат. Мозги уже завезли 😎",
             "как оно": "Работаю, брат. Мозги уже завезли 😎",
@@ -62,6 +62,20 @@ class LocalResponseTests(unittest.TestCase):
         for text in ("покупка", "покупка квартиры", "machine", "братство", "расскажи о python, брат", "что такое python"):
             with self.subTest(text=text):
                 self.assertIsNone(brother.get_response(text))
+
+
+class GreetingRoutingTests(unittest.IsolatedAsyncioTestCase):
+    async def test_greeting_with_question_reaches_ai_unchanged(self):
+        for text in (
+            "Hi! What can you help me with? Keep it brief.",
+            "Привет! Что ты умеешь?",
+            "Как дела? Объясни Python.",
+        ):
+            with self.subTest(text=text), patch("brother.ask_ai", new_callable=AsyncMock, return_value="AI_REPLY") as ai:
+                update = fake_update(text)
+                await brother.handle_message(update, None)
+                ai.assert_awaited_once_with(text, 200)
+                update.message.reply_text.assert_awaited_once_with("AI_REPLY")
 
 
 class AIFallbackTests(TemporaryMemory, unittest.IsolatedAsyncioTestCase):
